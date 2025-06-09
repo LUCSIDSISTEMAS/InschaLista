@@ -71,7 +71,7 @@
       color: #a23c94;
     }
 
-    .congregacao {
+    .congregacao, .telefone {
       font-size: 0.95rem;
       color: #555;
     }
@@ -91,7 +91,7 @@
   <div class="lista" id="listaInscritas"></div>
 
   <script>
-    const URL = "https://script.google.com/macros/s/AKfycbzvMt65ith2lPGcyj_Rmt5oHe-mqhjl1DeQ09rPQSOXMsYeuxjXp_XyAN4OAiJbAQ1mHQ/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbyTDj-5aTCj_8rjKpBI2k2Yc6HSqGGQYIBA-qqPF2HYQ2sCNWkz7V2zf0QqghWego8Dqg/exec";
 
     fetch(URL)
       .then(res => res.json())
@@ -106,6 +106,7 @@
           div.innerHTML = `
             <div class="nome">👩 ${item.nome}</div>
             <div class="congregacao">⛪ ${item.congregacao}</div>
+            <div class="telefone">📞 ${item.telefone}</div>
           `;
           lista.appendChild(div);
           count++;
