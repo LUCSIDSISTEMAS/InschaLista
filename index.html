@@ -71,9 +71,38 @@
       color: #a23c94;
     }
 
-    .congregacao, .telefone {
+    .congregacao, .telefone, .status {
       font-size: 0.95rem;
       color: #555;
+      margin-top: 0.3rem;
+    }
+
+    .item button {
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background-color: #a23c94;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      font-size: 1.4rem;
+      color: #a23c94;
+      font-weight: bold;
+      flex-direction: column;
+    }
+
+    .loading-overlay .spinner {
+      margin-bottom: 1rem;
     }
 
     @media(min-width: 768px) {
@@ -90,8 +119,13 @@
   </div>
   <div class="lista" id="listaInscritas"></div>
 
+  <div class="loading-overlay" id="loadingPagamento">
+    <div class="spinner"></div>
+    Atualizando pagamento...
+  </div>
+
   <script>
-    const URL = "https://script.google.com/macros/s/AKfycbyTDj-5aTCj_8rjKpBI2k2Yc6HSqGGQYIBA-qqPF2HYQ2sCNWkz7V2zf0QqghWego8Dqg/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbzT443HYpotN4g6LYWm5YvFdkQVAqsQffO3qExbNeOGPrD9QJK4z2GWWaWDxzEC0gCOLg/exec";
 
     fetch(URL)
       .then(res => res.json())
@@ -100,13 +134,18 @@
         const total = document.getElementById("totalInscritos");
         let count = 0;
 
-        data.forEach(item => {
+        data.forEach((item, index) => {
           const div = document.createElement("div");
           div.className = "item";
+
+          const status = item.status?.trim() === "OK" ? "Pago ✅" : "Pendente ⏳";
+
           div.innerHTML = `
             <div class="nome">👩 ${item.nome}</div>
             <div class="congregacao">⛪ ${item.congregacao}</div>
             <div class="telefone">📞 ${item.telefone}</div>
+            <div class="status">💰 Status: <strong>${status}</strong></div>
+            ${status.includes("Pendente") ? `<button onclick="marcarComoPago(${index})">Pagar</button>` : ""}
           `;
           lista.appendChild(div);
           count++;
@@ -120,6 +159,26 @@
         document.getElementById("spinner").style.display = "none";
         console.error(err);
       });
+
+    function marcarComoPago(index) {
+      const linha = index + 2; // 1 é cabeçalho
+      const loading = document.getElementById("loadingPagamento");
+      loading.style.display = "flex";
+
+      fetch(URL, {
+        method: "POST",
+        body: new URLSearchParams({ linha: linha })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        loading.style.display = "none";
+        location.reload();
+      })
+      .catch(() => {
+        loading.style.display = "none";
+        alert("Erro ao processar o pagamento.");
+      });
+    }
   </script>
 </body>
 </html>
